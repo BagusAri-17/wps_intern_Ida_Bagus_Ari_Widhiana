@@ -30,7 +30,7 @@
                             {{-- Level Select Input --}}
                             <div>
                                 <x-input-label for="level" :value="__('Level Position')" />
-                                <select id="level" name="level" class="block w-full mt-1 text-sm text-gray-300 bg-gray-900 border-gray-700 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                <select id="level" name="level" class="block w-full mt-1 text-sm border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">
                                     <option selected>Select Level of Position</option>
                                     <option value="2">Manager</option>
                                     <option value="3">Staff</option>
