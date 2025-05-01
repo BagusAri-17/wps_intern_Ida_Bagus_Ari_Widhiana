@@ -18,6 +18,9 @@
                     <x-nav-link :href="route('manage-position.index')" :active="request()->routeIs('manage-position.index')">
                         {{ __('Manage Position') }}
                     </x-nav-link>
+                    <x-nav-link :href="route('manage-user.index')" :active="request()->routeIs('manage-user.index')">
+                        {{ __('Manage User') }}
+                    </x-nav-link>
                 </div>
             </div>
 
@@ -75,6 +78,9 @@
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('manage-position.index')" :active="request()->routeIs('manage-position.index')">
                 {{ __('Manage Position') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('manage-user.index')" :active="request()->routeIs('manage-user.index')">
+                {{ __('Manage User') }}
             </x-responsive-nav-link>
         </div>
 

@@ -16,7 +16,7 @@ class PositionController extends Controller
     {
         $positions = Position::where('level', '!=', 1)->get();
 
-        return view('pages.dashboard.position.index', compact('positions'));
+        return view('pages.dashboard.manage-position.index', compact('positions'));
     }
 
     /**
@@ -24,7 +24,7 @@ class PositionController extends Controller
      */
     public function create()
     {
-        return view('pages.dashboard.position.create');
+        return view('pages.dashboard.manage-position.create');
     }
 
     /**
@@ -61,7 +61,7 @@ class PositionController extends Controller
     {
         $position = Position::findOrFail($id);
 
-        return view('pages.dashboard.position.edit', compact('position'));
+        return view('pages.dashboard.manage-position.edit', compact('position'));
     }
 
     /**
