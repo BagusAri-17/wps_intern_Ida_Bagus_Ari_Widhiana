@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DailyLogController;
 use App\Http\Controllers\PositionController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
@@ -22,6 +23,7 @@ Route::middleware('auth')->group(function () {
 Route::prefix('dashboard')->group(function () {
     Route::resource('manage-position', PositionController::class);
     Route::resource('manage-user', UserController::class);
+    Route::resource('manage-daily-log', DailyLogController::class);
 })->middleware(['auth']);
 
 require __DIR__.'/auth.php';

@@ -21,6 +21,9 @@
                     <x-nav-link :href="route('manage-user.index')" :active="request()->routeIs('manage-user.index')">
                         {{ __('Manage User') }}
                     </x-nav-link>
+                    <x-nav-link :href="route('manage-daily-log.index')" :active="request()->routeIs('manage-daily-log.index')">
+                        {{ __('Manage Daily Log') }}
+                    </x-nav-link>
                 </div>
             </div>
 
@@ -81,6 +84,9 @@
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('manage-user.index')" :active="request()->routeIs('manage-user.index')">
                 {{ __('Manage User') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('manage-daily-log.index')" :active="request()->routeIs('manage-daily-log.index')">
+                {{ __('Manage Daily Log') }}
             </x-responsive-nav-link>
         </div>
 
