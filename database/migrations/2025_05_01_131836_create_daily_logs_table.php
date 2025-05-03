@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->text('description');
-            $table->text('proof of employment');
+            $table->text('proof_of_employment');
             $table->string('status');
             $table->timestamps();
         });

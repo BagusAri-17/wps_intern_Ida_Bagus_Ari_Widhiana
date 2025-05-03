@@ -6,6 +6,7 @@ use App\Models\DailyLog;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Redirect;
 
 class DailyLogController extends Controller
 {
@@ -15,11 +16,33 @@ class DailyLogController extends Controller
     public function index()
     {
         $user = Auth::user();
-        // $level = $user->detail_user->position->level;
+        $level = $user->detail_user->position->level;
 
-        // $myLogs = DailyLog::where('user_id', $user->id)->get();
+        $myLogs = DailyLog::where('user_id', $user->id)->get();
+        $listLogs = collect();
+        $logsToVerify = collect();
+        
+        if ($level === 1) {
+            $verifyIds = User::whereHas('detail_user', function ($q) {
+                $q->whereIn('position_id', function ($sub) {
+                    $sub->select('id')->from('positions')->where('level', '>', 1);
+                });
+            })->pluck('id');
 
-        return view('pages.dashboard.manage-daily-log.index');
+            $listLogs = DailyLog::whereIn('user_id', $verifyIds)->get();
+            $logsToVerify = DailyLog::whereIn('user_id', $verifyIds)->where('status', 'pending')->get();
+        } elseif ($level === 2) {
+            $verifyIds = User::whereHas('detail_user', function ($q) {
+                $q->whereIn('position_id', function ($sub) {
+                    $sub->select('id')->from('positions')->where('level', '=', 3);
+                })->where('manage_by', Auth::user()->id);
+            })->pluck('id');
+
+            $listLogs = DailyLog::whereIn('user_id', $verifyIds)->get();
+            $logsToVerify = DailyLog::whereIn('user_id', $verifyIds)->where('status', 'pending')->get();
+        }
+
+        return view('pages.dashboard.manage-daily-log.index', compact('level', 'myLogs', 'logsToVerify', 'listLogs'));
     }
 
     /**
@@ -27,7 +50,7 @@ class DailyLogController extends Controller
      */
     public function create()
     {
-        //
+        return view('pages.dashboard.manage-daily-log.create');
     }
 
     /**
@@ -35,7 +58,27 @@ class DailyLogController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $user = Auth::user();
+        $userId = $user->id;
+        $level = $user->detail_user->position->level;
+        $timestamp = now()->format('Ymd_His');
+
+        $fileProofOfEmployment = $request->file('proof_of_employment');
+        $customFileProofOfEmploymentName = 'FileProofOfEmployment_'.$timestamp.'_UID'.$userId.'_L'.$level.'.'.$fileProofOfEmployment->extension();
+
+        $request->validate([
+            'description' => 'required|string',
+            'proof_of_employment' => 'max:2048'
+        ]);
+
+        DailyLog::create([
+            'user_id' => $userId,
+            'description' => $request->description,
+            'proof_of_employment' => $fileProofOfEmployment->storeAs('file-proof-of-employment', $customFileProofOfEmploymentName, 'public'),
+            'status' => 'pending'
+        ]);
+
+        return Redirect::route('manage-daily-log.index');
     }
 
     /**
@@ -68,5 +111,23 @@ class DailyLogController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    public function accepted($id)
+    {
+        $dailyLog = DailyLog::find($id);
+        $dailyLog->status = 'accept';
+        
+        $dailyLog->save();
+        return Redirect::route('manage-daily-log.index');
+    }
+
+    public function rejected($id)
+    {
+        $dailyLog = DailyLog::find($id);
+        $dailyLog->status = 'reject';
+        
+        $dailyLog->save();
+        return Redirect::route('manage-daily-log.index');
     }
 }

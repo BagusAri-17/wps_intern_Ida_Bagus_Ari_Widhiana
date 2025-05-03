@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -16,9 +17,23 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = User::query()->get();
+        $users = collect();
 
-        // dd($users->detail_user);
+        if (Auth::user()->detail_user->position->level === 1) {
+            $users = User::whereHas('detail_user', function ($q) {
+                $q->whereIn('position_id', function ($sub) {
+                    $sub->select('id')->from('positions')->where('level', '>', 1);
+                });
+            })->get();
+        }
+
+        if (Auth::user()->detail_user->position->level === 2) {
+            $users = User::whereHas('detail_user', function ($q) {
+                $q->whereIn('position_id', function ($sub) {
+                    $sub->select('id')->from('positions')->where('level', '=', 3);
+                })->where('manage_by', Auth::user()->id);
+            })->get();
+        }
 
         return view('pages.dashboard.manage-user.index', compact('users'));
     }

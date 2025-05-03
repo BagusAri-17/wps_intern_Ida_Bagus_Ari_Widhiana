@@ -6,6 +6,8 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Middleware\CheckRole;
+
 Route::get('/', function () {
     return view('welcome');
 });
@@ -21,9 +23,12 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::prefix('dashboard')->group(function () {
-    Route::resource('manage-position', PositionController::class);
-    Route::resource('manage-user', UserController::class);
+    Route::resource('manage-position', PositionController::class)->middleware('checkrole:1,2');
+    Route::resource('manage-user', UserController::class)->middleware('checkrole:1,2');
     Route::resource('manage-daily-log', DailyLogController::class);
+
+    Route::get('manage-daily-log/accept/status/{id}', [DailyLogController::class, 'accepted'])->name('accept.status');
+    Route::get('manage-daily-log/reject/status/{id}', [DailyLogController::class, 'rejected'])->name('reject.status');
 })->middleware(['auth']);
 
 require __DIR__.'/auth.php';
