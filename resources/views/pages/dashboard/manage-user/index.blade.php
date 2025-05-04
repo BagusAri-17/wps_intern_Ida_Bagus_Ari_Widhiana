@@ -52,7 +52,7 @@
                                 @forelse ($users as $item)
                                     <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200">
                                         <td class="px-6 py-4">
-                                            {{ $item->id }}.
+                                            {{ $loop->index+1 }}.
                                         </td>
                                         <td class="px-6 py-4">
                                             {{ $item->name }}

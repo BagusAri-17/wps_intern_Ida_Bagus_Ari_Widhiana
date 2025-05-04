@@ -5,6 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -50,5 +51,10 @@ class User extends Authenticatable
     public function detail_user(): HasOne
     {
         return $this->hasOne(DetailUser::class, 'user_id');
+    }
+
+    public function daily_log(): HasMany
+    {
+        return $this->hasMany(DailyLog::class, 'user_id');
     }
 }
