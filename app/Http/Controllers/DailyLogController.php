@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class DailyLogController extends Controller
@@ -105,7 +106,9 @@ class DailyLogController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $dailyLog = DailyLog::findOrFail($id);
+
+        return view('pages.dashboard.manage-daily-log.edit', compact('dailyLog'));
     }
 
     /**
@@ -113,7 +116,34 @@ class DailyLogController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $user = Auth::user();
+        $userId = $user->id;
+        $level = $user->detail_user->position->level;
+        $timestamp = now()->format('Ymd_His');
+
+        $request->validate([
+            'description' => 'required|string',
+            'proof_of_employment' => 'max:2048'
+        ]);
+
+        $dailyLog = DailyLog::findOrFail($id);
+
+        if ($request->hasFile('proof_of_employment')) {
+            if ($dailyLog->proof_of_employment && Storage::exists('file-proof-of-employment/' . basename($dailyLog->proof_of_employment))) {
+                Storage::delete('file-proof-of-employment/' . basename($dailyLog->proof_of_employment));
+            }
+    
+            $fileProofOfEmployment = $request->file('proof_of_employment');
+            $customFileProofOfEmploymentName = 'FileProofOfEmployment_'.$timestamp.'_UID'.$userId.'_L'.$level.'.'.$fileProofOfEmployment->extension();
+            $fileProofOfEmployment->storeAs('file-proof-of-employment', $customFileProofOfEmploymentName, 'public');
+
+            $dailyLog->proof_of_employment = 'file-proof-of-employment/' . $customFileProofOfEmploymentName;
+        }
+
+        $dailyLog->description = $request->description;
+        $dailyLog->save();
+
+        return Redirect::route('manage-daily-log.index');
     }
 
     /**
@@ -121,7 +151,13 @@ class DailyLogController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $dailyLog = DailyLog::findOrFail($id);
+        if ($dailyLog->proof_of_employment && Storage::exists('file-proof-of-employment/' . basename($dailyLog->proof_of_employment))) {
+            Storage::delete('file-proof-of-employment/' . basename($dailyLog->proof_of_employment));
+        }
+        $dailyLog->delete();
+
+        return Redirect::route('manage-daily-log.index');
     }
 
     public function accepted($id)
