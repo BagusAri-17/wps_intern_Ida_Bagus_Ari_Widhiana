@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Str;
 
 class DailyLogController extends Controller
 {
@@ -21,7 +22,7 @@ class DailyLogController extends Controller
         $myLogs = DailyLog::where('user_id', $user->id)->get();
         $listLogs = collect();
         $logsToVerify = collect();
-        
+
         if ($level === 1) {
             $verifyIds = User::whereHas('detail_user', function ($q) {
                 $q->whereIn('position_id', function ($sub) {
@@ -42,7 +43,15 @@ class DailyLogController extends Controller
             $logsToVerify = DailyLog::whereIn('user_id', $verifyIds)->where('status', 'pending')->get();
         }
 
-        return view('pages.dashboard.manage-daily-log.index', compact('level', 'myLogs', 'logsToVerify', 'listLogs'));
+        $calendarEvents = $listLogs->map(function ($item) {
+            return [
+                'title' => Str::limit($item->description, 20),
+                'start' => $item->created_at->format('Y-m-d'),
+                'url' => route('manage-daily-log.show', $item->id),
+            ];
+        });
+
+        return view('pages.dashboard.manage-daily-log.index', compact('level', 'myLogs', 'logsToVerify', 'listLogs', 'calendarEvents'));
     }
 
     /**
@@ -86,7 +95,9 @@ class DailyLogController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $dailyLog = DailyLog::findOrFail($id);
+
+        return view('pages.dashboard.manage-daily-log.detail', compact('dailyLog'));
     }
 
     /**

@@ -275,6 +275,32 @@
                     </div>
                 </div>
             @endif
+
+            {{-- Calendar --}}
+            @if ($level === 1 || $level === 2)
+                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-md mb-4">
+                    <div class="p-4 text-center">
+                        <h3 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+                            {{ __('Calendar Daily Logs') }}
+                        </h3>
+                    </div>
+                    <div class="relative overflow-x-auto p-4">
+                        <div id='calendar'></div>
+                    </div>
+                </div>
+            @endif
         </div>
     </div>
 </x-app-layout>
+
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.17/index.global.min.js'></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        events: @json($calendarEvents)
+        });
+        calendar.render();
+    });
+</script>
